@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!--兼容模式处理-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--高速模式-->
+  <meta name="renderer" content="webkit">
+  <!--响应式-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="index,follow" />
+  <!--引入pintuer.css-->
+  <link rel="stylesheet" href="../../Public/css/pintuer.css" type="text/css">
+  <!--<link rel="stylesheet" href="../../Public/css/adapt.css" type="text/css">-->
+  <!--  <link rel="stylesheet" href="pager.css" type="text/css">-->
+  <!--  <link rel="prefetch" href="#" />-->
+  <!--引入pintuer.js和jquery.js jquery需要在pintuer之前引用-->
+
+  <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.js"></script>
+
+  <!--<script src="../../Public/javascript/jquery.js" type="text/javascript"></script>-->
+  <script src="../../Public/javascript/pintuer.js" type="text/javascript"></script>
+  <script src="../../Public/javascript/respond.js" type="text/javascript"></script>
+
+  <!--SEO优化-->
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+</head>
+<body>
+<div class="navbar bg-green bg-inverse radius ">
+  <div class="navbar-head">
+    <button class="button bg icon-navicon" data-target="#naver"></button>
+    <a href="#"><img src="" alt=""></a>
+  </div>
+  <div class="navbar-body nav-navicon" id="naver">
+    <ul class="nav nav-inline nav-menu  ">
+      <li class="active"><a href="#">首页</a> </li>
+      <li><a href="create.html">商品管理</a></li>
+      <li><a href="dataTable.html">商品列表</a></li>
+    </ul>
+<!--    <div class="navbar-form navbar-right">
+      <input type="text" class="input input-auto"  id="search"  size="20" placeholder="商品类别" />
+      &lt;!&ndash; <input type="submit" name="search" value="搜索" id="searchId"  class="button bg" />&ndash;&gt;
+      <button  class="button bg" id="viewBtn">Search</button>
+    </div>-->
+  </div>
+</div>
+<div class="container">
+  <div class="panel panel-default" style="margin-top: 100px;text-align: center;">
+    <div class="panel-head">商品展示</div>
+    <div class="panel-body">
+      <div class="line-middle" id="data-area">
+  </div>
+    </div>
+  </div>
+  <!--显示分页按钮-->
+  <ul class="pagination pagination-big float-right border-sub" style="margin-top: 20px;" id="pageBar"></ul>
+</div>
+<script>
+    // $(document).ready(function () {});
+        var username = sessionStorage.getItem('username');
+        if (!username) {
+            alert("登陆信息已过期，请重新登陆！");
+            window.location.href = "../../login.html";
+        } else {
+            console.log(username);
+            var curPage;        //当前页数
+            var totalItem;      //总记录数
+            var pageSize;       //每一页记录数
+            var totalPage;      //总页数
+            //获取分页数据
+            function turnPage(page) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/App/Controller/indexController.php',     //这里是请求的后台地址，自己定义
+                    data: {
+                        'pageNum': page
+                    },
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#data-area ").append("加载中...");
+                    },
+                    success: function (json) {
+                        //console.log(json);
+                        var result = [];
+                        $("#data-area ").empty();       //移除原来的分页数据
+                        curPage = page;
+                        console.log('in:'+curPage);
+                        var data_html = "";
+                        for (var i = 0; i < json.length; i++) {
+                            result[i] = JSON.parse(json[i].replace(/\n/g, "\\n").replace(/\r/g, "\\r"));
+                            totalItem = result[i].totalItem;
+                            console.log("totalItem:" + totalItem);
+                            pageSize = result[i].pageSize;
+                            totalPage = result[i].totalPage;
+                            var commodity_id =result[i].commodity_id;
+                            //console.log("11:"+commodity_id);
+                            var commodity = result[i].commodity;
+                            //var in_price = result[i].in_price;
+                            var out_price = result[i].out_price;
+                            var cate = result[i].cate;
+                            //var imageUrl = result[i].imageURL;
+                            var url = result[i].url;
+                            //style="width:300px;height: auto;max-height: 300px;overflow:hidden;"
+                            data_html += '<div class="xl12 xs6 xm4 xb3"  ><div class="media padding-bottom clearfix" ><a  href="detail.html#'+commodity_id+'"><img src='
+                                + url + ' class="radius img-responsive" style="width:300px;height: auto;max-height: 180px;overflow:hidden;"></a><div class="media-body"><strong class="float-left">商品名称：'
+                                + commodity + '</strong><br><span class="text-gray float-left">分类：'
+                                + cate + '</span><br><span class="text-gray float-left">售价：'
+                                + out_price + '</span></div></div></div>';
+                        }
+                        $("#data-area ").append(data_html);
+                    },
+                    complete: function () {    //添加分页按钮栏
+                        getPageBar();
+                    },
+                    error: function () {
+                        alert("数据加载失败");
+                    }
+                });
+            }
+
+            //获取分页条（分页按钮栏的规则和样式根据自己的需要来设置）
+            function getPageBar() {
+                if (curPage > totalPage) {
+                    curPage = totalPage;
+                }
+                if (curPage < 1) {
+                    curPage = 1;
+                }
+
+                pageBar = "";
+
+                //如果不是第一页
+                if (curPage != 1) {
+                    pageBar += "<li><a href='javascript:turnPage(1)'>首页</a></li>";
+                    pageBar += "<li><a href='javascript:turnPage(" + (curPage - 1) + ")'><<</a></li>";
+                }
+
+                //显示的页码按钮(5个)
+                var start, end;
+                if (totalPage <= 5) {
+                    start = 1;
+                    end = totalPage;
+                } else {
+                    if (curPage - 2 <= 0) {
+                        start = 1;
+                        end = 5;
+                    } else {
+                        if (totalPage - curPage < 2) {
+                            start = totalPage - 4;
+                            end = totalPage;
+                        } else {
+                            start = curPage - 2;
+                            end = curPage + 2;
+                        }
+                    }
+                }
+
+                for (var i = start; i <= end; i++) {
+                    if (i == curPage) {
+                        pageBar += "<li class='active'><a href='javascript:turnPage(" + i + ")'>" + i + "</a></li>";
+                    } else {
+                        pageBar += "<li><a href='javascript:turnPage(" + i + ")'>" + i + "</a></li>";
+                    }
+                }
+
+                //如果不是最后页
+                if (curPage != totalPage) {
+                    pageBar += "<li><a href='javascript:turnPage(" + (parseInt(curPage) + 1) + ")'>>></a></li>";
+                    pageBar += "<li><a href='javascript:turnPage(" + totalPage + ")'>尾页</a></li>";
+                }
+
+                $("#pageBar").html(pageBar);
+            }
+
+            //页面加载时初始化分页
+            $(function () {
+                console.log('in');
+                turnPage(1);
+            });
+        }
+</script>
+</body>
+
+</html>

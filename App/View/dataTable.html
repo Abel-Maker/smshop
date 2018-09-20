@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>测试表格</title>
+  <!--引入pintuer.css-->
+  <link rel="stylesheet" href="../../Public/css/pintuer.css" type="text/css">
+  <link rel="stylesheet" href="../../Public/css/datatables.min.css" type="text/css">
+  <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.js"></script>
+  <script type="text/javascript" charset="utf8" src="../../Public/javascript/datatables.min.js"></script>
+  <script src="../../Public/javascript/pintuer.js" type="text/javascript"></script>
+  <script src="../../Public/javascript/respond.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="navbar bg-green bg-inverse radius ">
+  <div class="navbar-head">
+    <button class="button bg icon-navicon" data-target="#naver"></button>
+    <a href="#"><img src="" alt=""></a>
+  </div>
+  <div class="navbar-body nav-navicon" id="naver">
+    <ul class="nav nav-inline nav-menu  ">
+      <li ><a href="index.html">首页</a> </li>
+      <li><a href="create.html">商品管理</a></li>
+      <li class="active"><a href="#">商品列表</a></li>
+    </ul>
+  </div>
+</div>
+<!--<div class="table-responsive">
+  <table id="data-area" class="table table-hover">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Office</th>
+      <th>Salary</th>
+      <th>age</th>
+    </tr>
+    </thead>
+    <tbody >
+    </tbody>
+  </table>
+</div>-->
+<!--<table id="table_id" class="display">-->
+  <!--<tr>-->
+  <!--<th width="100" >图片</th>-->
+  <!--<th width="*">信息</th>-->
+  <!--<th width="*">分类</th>-->
+  <!--<th width="100">价格(元)</th>-->
+  <!--<th width="*">描述</th>-->
+  <!--<th width="100">操作</th>-->
+  <!--</tr>-->
+<!--</table>-->
+
+
+<div class="table-responsive" style="margin: 10px">
+  <table id="data" class="table table-hover">
+    <thead>
+      <tr>
+        <th >商品名称</th>
+        <th >商品型号</th>
+        <th >商品种类</th>
+        <th >商品进价</th>
+        <th >商品售价</th>
+        <th >商品描述</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+</body>
+
+<script>
+    $(document).ready(function () {
+/*
+        function Commodity ( name, size, cate, in_price,out_price,detail ) {
+            this.name = name;
+            this.size = size;
+            this.cate = cate;
+            this.in_price = in_price;
+            this.out_price =out_price;
+            this.detail =detail;
+             var data1 = [this.name,this.size,this.cate,this.in_price,this.out_price,this.detail];
+            // var data={
+            //         '"商品名称"':this.name,
+            //         '"商品型号"':this.size,
+            //         '"商品种类"':this.cate,
+            //         '"商品进价"':this.in_price,
+            //         '"商品售价"':this.out_price,
+            //         '"商品描述"':this.detail
+            //     };
+            return data1;
+            // this.detail = function () {
+            //     return this._detail;
+            // }
+        }*/
+
+        var arr= [];
+        var username = sessionStorage.getItem('username');
+        if (!username) {
+            alert("登陆信息已过期，请重新登陆！");
+            window.location.href = "../../login.html";
+        } else {
+            console.log(username);
+            //获取分页数据
+            $.ajax({
+                type: 'GET',
+                url: '/App/Controller/tableController.php',     //这里是请求的后台地址，自己定义
+                dataType: 'json',
+                success: function (json) {
+                    var result = [];
+                    var getData=[];
+                    var data_html = "";
+                    for (var i = 0; i < json.length; i++) {
+                        result[i] = JSON.parse(json[i].replace(/\n/g, "\\n").replace(/\r/g, "\\r"));
+                        if(result[i].success){
+                            var commodity = result[i].commodity;
+                            var size =result[i].size;
+                            var detail =result[i].detail;
+                            var in_price = result[i].in_price;
+                            var out_price = result[i].out_price;
+                            var cate = result[i].cate;
+                            var imageUrl = result[i].imageURL;
+                            var url = result[i].url;
+                            arr[i]=[commodity,size,cate,in_price,out_price,detail];
+                            console.log('arr01:'+arr[i]);
+                        }else {
+                            alert('Error:'+result[i].msg);
+                        }
+                    }
+                    console.log(arr);
+                    var table=$('#data').DataTable({
+                        destroy:true,
+                        // retrieve:true,
+                        data:arr
+                        //paging:false, 分页
+                        //searching:false,搜索
+                    });
+                },
+                error: function () {
+                    alert("数据加载失败");
+                }
+            });
+
+
+
+        }
+    })
+</script>
+</html>

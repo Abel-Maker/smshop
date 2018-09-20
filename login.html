@@ -1,0 +1,122 @@
+<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>商品管理系统</title>
+  <meta name="author" content="DeathGhost" />
+  <link rel="stylesheet" type="text/css" href="Public/css/style.css" tpabs="Public/css/style.css" />
+  <style>
+    body{height:100%;background:#16a085;overflow:hidden;}
+    canvas{z-index:-1;position:absolute;}
+  </style>
+  <script src="Public/javascript/jquery.js"></script>
+</head>
+<body>
+<dl class="admin_login">
+  <dt>
+    <strong>商品后台管理系统</strong>
+    <em>Management System</em>
+  </dt>
+  <dd class="user_icon">
+    <input type="text" id="username" placeholder="账号" class="login_txtbx"/>
+  </dd>
+  <dd class="pwd_icon">
+    <input type="password" id="passwd" placeholder="密码" class="login_txtbx"/>
+  </dd>
+  <!--<dd class="val_icon">-->
+    <!--<div class="checkcode">-->
+      <!--<input type="text" id="J_codetext" placeholder="验证码" maxlength="4" class="login_txtbx">-->
+      <!--<canvas class="J_codeimg" id="myCanvas" onclick="createCode()">对不起，您的浏览器不支持canvas，请下载最新版浏览器!</canvas>-->
+    <!--</div>-->
+    <!--<input type="button" value="验证码核验" class="ver_btn" onClick="validate();">-->
+  <!--</dd>-->
+  <dd>
+    <input type="button" id="submit" value="立即登陆"  class="submit_btn " />
+  </dd>
+  <dd>
+    <p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+  </dd>
+</dl>
+</body>
+<script src="Public/javascript/verificationNumbers.js" tppabs="Public/javascript/verificationNumbers.js"></script>
+<script src="Public/javascript/Particleground.js" tppabs="Public/javascript/Particleground.js"></script>
+<script>
+    $(document).ready(function () {
+        //粒子背景特效
+        $('body').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+        });
+        //验证码
+        //createCode();
+        $('#submit').click(function () {
+            var username =$('#username').val();
+            var passwd =$('#passwd').val();
+            console.log('用户名：'+username);
+            if((username ==='')||(passwd ==='')){
+                alert('账号或密码未输入！');
+            }else {
+                // alert('正在登陆...');
+                $.ajax({
+                    type:"GET",
+                    url:"/App/Controller/LoginController.php?username="+username+"&&passwd="+passwd,
+                    dataType:"json",
+                    success:function (data) {
+                        if(data.success){
+                            alert("欢迎"+""+data.msg);
+                            sessionStorage.setItem('username',data.session);
+                            //alert(data.msg);
+                            window.location.href="App/View/index.html";
+                            //window.open('index.html','__self');//新建一个页面
+                        }else {
+                            alert("Error-success:"+data.msg);
+                        }
+                    },
+                    error:function (jqXHR) {
+                        alert("Error:"+jqXHR.status);
+                    }
+                })
+            }
+
+        });
+        $('#passwd').keyup(function (e) {
+            //	alert(e.keyCode);
+            if(e.keyCode==13){
+                // alert('Enter!');
+                var username =$('#username').val();
+                var passwd =$('#passwd').val();
+                console.log('用户名：'+username);
+                if((username ==='')||(passwd ==='')){
+                    alert('账号或密码未输入！');
+                }else {
+                    // alert('正在登陆...');
+                    $.ajax({
+                        type:"GET",
+                        url:"/App/Controller/LoginController.php?username="+username+"&&passwd="+passwd,
+                        dataType:"json",
+                        success:function (data) {
+                            if(data.success){
+                                alert("欢迎"+""+data.msg);
+                                sessionStorage.setItem('username',data.session);
+                                //alert(data.msg);
+                                window.location.href="App/View/index.html";
+                            }else {
+                                alert("Error-success:"+data.msg);
+                            }
+                        },
+                        error:function (jqXHR) {
+                            alert("Error:"+jqXHR.status);
+                        }
+                    })
+                }
+            }
+        })
+    })
+
+
+
+</script>
+</html>

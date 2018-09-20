@@ -7,7 +7,7 @@
  */
 
 //连接数据库
-$conn=mysqli_connect("localhost","root","Abel555.",'shop');
+$conn=mysqli_connect("localhost","root","###.",'shop');
 //if (!$conn)       die('Could not connect: '.mysqli_error());
 mysqli_query($conn,"set names utf8");
 

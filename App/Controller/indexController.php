@@ -25,7 +25,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 function search(){
 
     //数据库
-    $link =mysqli_connect("localhost","root","Abel555.","shop");
+    $link =mysqli_connect("localhost","root","#####.","shop");
     mysqli_query($link,"set names utf8");
     //获取page
     $pageNum = $_GET['pageNum'];

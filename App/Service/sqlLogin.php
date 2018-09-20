@@ -18,7 +18,7 @@ class sqlLogin{
     protected $change =false;
     function __construct($username)
     {
-        $link =mysqli_connect("localhost","root","Abel555.","shop");
+        $link =mysqli_connect("localhost","root","###.","shop");
         mysqli_query($link,"set names utf8");
         $res = mysqli_query($link,"select * from shop.user WHERE username=$username");
         $this->data=$res->fetch_assoc();
